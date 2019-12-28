@@ -82,7 +82,8 @@ router.post('users.s3Upload', auth(), async ctx => {
   ctx.assertPresent(size, 'size is required');
 
   const s3Key = uuid.v4();
-  const key = `uploads/${ctx.state.user.id}/${s3Key}/${filename}`;
+  const prefix = process.env.AWS_S3_UPLOAD_BUCKET_PREFIX;
+  const key = `${prefix ? prefix+'/' : ''}uploads/${ctx.state.user.id}/${s3Key}/${filename}`;
   const credential = makeCredential();
   const longDate = format(new Date(), 'YYYYMMDDTHHmmss\\Z');
   const policy = makePolicy(credential, longDate);
