@@ -55,7 +55,7 @@ class ApiClient {
         body,
         headers,
         redirect: 'follow',
-        credentials: 'omit',
+        credentials: 'include',  // TODO: better solution than allowing all credentials through?
         cache: 'no-cache',
       });
     } catch (err) {

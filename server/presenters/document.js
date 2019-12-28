@@ -51,5 +51,12 @@ export default async function present(document: Document, options: ?Options) {
     }).map(presentUser);
   }
 
+  // since I'm transforming the text on the fly - not an awful idea
+  // to do this in the presenters before it goes out to client
+  // ...but it seems a bit much to do all this in here???
+  if (options.CFUrlReplacer) {
+    data.text = options.CFUrlReplacer(document.text);
+  }
+
   return data;
 }

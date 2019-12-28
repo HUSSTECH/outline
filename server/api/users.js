@@ -109,7 +109,7 @@ router.post('users.s3Upload', auth(), async ctx => {
       form: {
         'Cache-Control': 'max-age=31557600',
         'Content-Type': kind,
-        acl: 'public-read',
+        acl: 'private',
         key,
         policy,
         'x-amz-algorithm': 'AWS4-HMAC-SHA256',

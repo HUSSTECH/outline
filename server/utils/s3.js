@@ -36,7 +36,7 @@ export const makePolicy = (credential: string, longDate: string) => {
     conditions: [
       { bucket: process.env.AWS_S3_UPLOAD_BUCKET_NAME },
       ['starts-with', '$key', ''],
-      { acl: 'public-read' },
+      { acl: 'private' },
       ['content-length-range', 0, +process.env.AWS_S3_UPLOAD_MAX_SIZE],
       ['starts-with', '$Content-Type', 'image'],
       ['starts-with', '$Cache-Control', ''],
@@ -92,7 +92,7 @@ export const uploadToS3FromUrl = async (url: string, key: string) => {
     const buffer = await res.buffer();
     await s3
       .putObject({
-        ACL: 'public-read',
+        ACL: 'private',
         Bucket: process.env.AWS_S3_UPLOAD_BUCKET_NAME,
         Key: key,
         ContentType: res.headers['content-type'],

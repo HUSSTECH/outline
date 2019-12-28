@@ -7,6 +7,7 @@ import { AuthenticationError, UserSuspendedError } from '../errors';
 import addMonths from 'date-fns/add_months';
 import addMinutes from 'date-fns/add_minutes';
 import { stripSubdomain } from '../../shared/utils/domains';
+import { getSignedCloudFrontCookie } from '../utils/cf';
 
 export default function auth(options?: { required?: boolean } = {}) {
   return async function authMiddleware(ctx: Context, next: () => Promise<*>) {
@@ -72,6 +73,35 @@ export default function auth(options?: { required?: boolean } = {}) {
         throw new UserSuspendedError({ adminEmail: suspendingAdmin.email });
       }
 
+      // set a cookie for CloudFront cookie signing
+      // session cookie only, deleted upon browser exit
+      // refreshed on authenticated requests if not present
+      // TODO: check if CF_SECURE_CONTENT enabled
+      // TODO: set cookie to be secure for production
+      // TODO: set cf cookie name via environment
+      // TODO: best practice to not strip the subdomain
+      // to make cookie more secure
+      // TODO: this is fairly expensive operation, the if {} block
+      // helps, but ideally want to do this few times as possible
+      if (process.env.AWS_CLOUDFRONT_URL && !ctx.cookies.get('CloudFront-Key-Pair-Id')) {
+        const cookie = await getSignedCloudFrontCookie();
+        ctx.cookies.set('CloudFront-Policy', cookie['CloudFront-Policy'], {
+          httpOnly: true,
+          // TODO: domain: `*.${hotst}`
+          // TODO: set secure if on https connection
+        });
+        ctx.cookies.set('CloudFront-Signature', cookie['CloudFront-Signature'], {
+          httpOnly: true,
+          // TODO: domain: `*.${hotst}`
+          // TODO: set secure if on https connection
+        });
+        ctx.cookies.set('CloudFront-Key-Pair-Id', cookie['CloudFront-Key-Pair-Id'], {
+          httpOnly: true,
+          // TODO: domain: `*.${hotst}`
+          // TODO: set secure if on https connection
+        });
+      };
+
       // not awaiting the promise here so that the request is not blocked
       user.updateActiveAt(ctx.request.ip);
 
@@ -99,6 +129,32 @@ export default function auth(options?: { required?: boolean } = {}) {
         expires: new Date('2100'),
         domain,
       });
+
+      // set CloudFront cookie
+      // Note: this is a good place for this logic
+      // but it's only called once on fresh sign-ins
+      // still need to make sure its always present
+      // when user is logged in via a cookie
+      // Note: unless CF domain is same origin as outline domain
+      // the CF cookies won't be set by this response anyway
+      if (process.env.AWS_CLOUDFRONT_URL && !ctx.cookies.get('CloudFront-Key-Pair-Id')) {
+        const cookie = await getSignedCloudFrontCookie();
+        ctx.cookies.set('CloudFront-Policy', cookie['CloudFront-Policy'], {
+          httpOnly: true,
+          // TODO: domain: `*.${hotst}`
+          // TODO: set secure if on https connection
+        });
+        ctx.cookies.set('CloudFront-Signature', cookie['CloudFront-Signature'], {
+          httpOnly: true,
+          // TODO: domain: `*.${hotst}`
+          // TODO: set secure if on https connection
+        });
+        ctx.cookies.set('CloudFront-Key-Pair-Id', cookie['CloudFront-Key-Pair-Id'], {
+          httpOnly: true,
+          // TODO: domain: `*.${hotst}`
+          // TODO: set secure if on https connection
+        });
+      };
 
       // set a transfer cookie for the access token itself and redirect
       // to the teams subdomain if subdomains are enabled

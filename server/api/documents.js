@@ -24,6 +24,7 @@ import {
 import { InvalidRequestError } from '../errors';
 import policy from '../policies';
 import { sequelize } from '../sequelize';
+import { CFUrlReplacer } from '../utils/cf';
 
 const Op = Sequelize.Op;
 const { authorize, cannot } = policy;
@@ -401,7 +402,7 @@ router.post('documents.info', auth({ required: false }), async ctx => {
   const isPublic = cannot(user, 'read', document);
 
   ctx.body = {
-    data: await presentDocument(document, { isPublic }),
+    data: await presentDocument(document, { isPublic, CFUrlReplacer }),
     policies: isPublic ? undefined : presentPolicies(user, [document]),
   };
 });
