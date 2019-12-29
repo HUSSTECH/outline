@@ -7,7 +7,7 @@ import { AuthenticationError, UserSuspendedError } from '../errors';
 import addMonths from 'date-fns/add_months';
 import addMinutes from 'date-fns/add_minutes';
 import { stripSubdomain } from '../../shared/utils/domains';
-import { getSignedCloudFrontCookie } from '../utils/cf';
+import { getSignedCloudFrontCookie, getCfCookieDomain } from '../utils/cf';
 
 export default function auth(options?: { required?: boolean } = {}) {
   return async function authMiddleware(ctx: Context, next: () => Promise<*>) {
@@ -87,18 +87,18 @@ export default function auth(options?: { required?: boolean } = {}) {
         const cookie = await getSignedCloudFrontCookie();
         ctx.cookies.set('CloudFront-Policy', cookie['CloudFront-Policy'], {
           httpOnly: true,
-          // TODO: domain: `*.${hotst}`
-          // TODO: set secure if on https connection
+          domain: getCfCookieDomain(ctx.hostname),
+          secure:  ctx.secure,
         });
         ctx.cookies.set('CloudFront-Signature', cookie['CloudFront-Signature'], {
           httpOnly: true,
-          // TODO: domain: `*.${hotst}`
-          // TODO: set secure if on https connection
+          domain: getCfCookieDomain(ctx.hostname),
+          secure:  ctx.secure,
         });
         ctx.cookies.set('CloudFront-Key-Pair-Id', cookie['CloudFront-Key-Pair-Id'], {
           httpOnly: true,
-          // TODO: domain: `*.${hotst}`
-          // TODO: set secure if on https connection
+          domain: getCfCookieDomain(ctx.hostname),
+          secure:  ctx.secure,
         });
       };
 
@@ -141,18 +141,18 @@ export default function auth(options?: { required?: boolean } = {}) {
         const cookie = await getSignedCloudFrontCookie();
         ctx.cookies.set('CloudFront-Policy', cookie['CloudFront-Policy'], {
           httpOnly: true,
-          // TODO: domain: `*.${hotst}`
-          // TODO: set secure if on https connection
+          domain: getCfCookieDomain(ctx.hostname),
+          secure:  ctx.secure,
         });
         ctx.cookies.set('CloudFront-Signature', cookie['CloudFront-Signature'], {
           httpOnly: true,
-          // TODO: domain: `*.${hotst}`
-          // TODO: set secure if on https connection
+          domain: getCfCookieDomain(ctx.hostname),
+          secure:  ctx.secure,
         });
         ctx.cookies.set('CloudFront-Key-Pair-Id', cookie['CloudFront-Key-Pair-Id'], {
           httpOnly: true,
-          // TODO: domain: `*.${hotst}`
-          // TODO: set secure if on https connection
+          domain: getCfCookieDomain(ctx.hostname),
+          secure:  ctx.secure,
         });
       };
 

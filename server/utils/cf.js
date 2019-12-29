@@ -36,3 +36,8 @@ const urlReplacer = text => {
 }
 
 export const CFUrlReplacer = AWS_CLOUDFRONT_URL && urlReplacer;
+
+export const getCfCookieDomain = hostname => {
+    // can only have 1 level deep subdomains on CF anyway
+    return (hostname === 'localhost' ? hostname : `*.${hostname.split('.').slice(-2).join('.')}`);
+}
