@@ -6,6 +6,7 @@ import webpackConfig from '../../webpack.config';
 
 const PUBLIC_PATH = webpackConfig.output.publicPath;
 
+// TODO: Do I need to add CF url here?
 const prefetchTags = [
   <link
     rel="dns-prefetch"

@@ -28,6 +28,8 @@ if (process.env.AWS_ACCESS_KEY_ID) {
   });
 }
 
+// TODO: add some protection here to ensure right combo of keys are present when using CF
+
 if (process.env.SLACK_KEY) {
   ['SLACK_SECRET', 'SLACK_VERIFICATION_TOKEN', 'SLACK_APP_ID'].forEach(key => {
     if (!process.env[key]) {
