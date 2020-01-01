@@ -113,3 +113,19 @@ export const uploadToS3FromUrl = async (url: string, key: string) => {
     }
   }
 };
+
+export const getSignedImageUrl = async (key: string) => {
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  });
+  invariant(AWS_S3_UPLOAD_BUCKET_NAME, 'AWS_S3_UPLOAD_BUCKET_NAME not set');
+
+  const params = {
+    Bucket: process.env.AWS_S3_UPLOAD_BUCKET_NAME,
+    Key: key,
+    Expires: 900
+  };
+
+  return s3.getSignedUrl('getObject', params);
+};
